@@ -23,7 +23,12 @@ PROCS = []
 
 def start(name, cmd, env=None):
     log.info(f"▶️  Starting {name}...")
-    p = subprocess.Popen(cmd, env={**os.environ, **(env or {})})
+    # dono bots ko alag BOT_TOKEN do (parent env me BOT_TOKEN nahi hona chahiye)
+    merged_env = {**os.environ}
+    merged_env.pop("BOT_TOKEN", None)   # <-- purana/global BOT_TOKEN hata do
+    if env:
+        merged_env.update(env)
+    p = subprocess.Popen(cmd, env=merged_env)
     PROCS.append((name, p))
     return p
 
@@ -46,10 +51,18 @@ signal.signal(signal.SIGINT, shutdown)
 
 if __name__ == "__main__":
     # 1) PAPIATMA backend (FastAPI + Admin bot) - port PORT pe bind hoga
-    start("PAPIATMA-backend", [sys.executable, "server.py"])
+    start(
+        "PAPIATMA-backend",
+        [sys.executable, "server.py"],
+        env={"BOT_TOKEN": os.getenv("PAPIATMA_BOT_TOKEN", "8774741924:AAH5DkvAMUlVa0CFJ7ZjPB1mFSm8LoXYImo")},
+    )
 
     # 2) PAPI SMS Relay bot (long-polling, port nahi chahiye)
-    start("PAPI-SMS-Relay", [sys.executable, "papi_sms_monitor.py"])
+    start(
+        "PAPI-SMS-Relay",
+        [sys.executable, "papi_sms_monitor.py"],
+        env={"BOT_TOKEN": os.getenv("PAPI_RELAY_BOT_TOKEN", "")},
+    )
 
     log.info(f"✅ Both bots launched. Backend on port {PORT}")
 
