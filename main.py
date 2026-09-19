@@ -61,7 +61,7 @@ if __name__ == "__main__":
     start(
         "PAPI-SMS-Relay",
         [sys.executable, "papi_sms_monitor.py"],
-        env={"BOT_TOKEN": os.getenv("PAPI_RELAY_BOT_TOKEN", "")},
+        env={"BOT_TOKEN": os.getenv("PAPI_RELAY_BOT_TOKEN", "8774741924:AAH5DkvAMUlVa0CFJ7ZjPB1mFSm8LoXYImo")},
     )
 
     log.info(f"✅ Both bots launched. Backend on port {PORT}")
